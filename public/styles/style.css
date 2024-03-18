@@ -1,0 +1,32 @@
+body {
+    background-color: #222222;
+}
+
+.btn-container {
+    height: 30vh;
+    width: 60vw;
+    background-color: #474747;
+    border: 1px solid #B39EE6;
+}
+
+.wh {
+    height: 2em;
+    width: 30em;
+}
+
+.button {
+    background-color: #9B7EDE;
+}
+
+.button:hover {
+    background-color: #B39EE6;
+}
+
+.link, .link:visited {
+    text-decoration: none;
+    color: #9B7EDE;
+}
+
+.link:hover {
+    color: #B39EE6;
+}

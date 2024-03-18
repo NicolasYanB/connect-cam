@@ -1,0 +1,56 @@
+body {
+    overflow: hidden;
+    position: fixed;
+    width: 100vw;
+}
+
+#owner {
+    top: 2%;
+    left: 1%;
+    border-radius: 10px;
+    width: 20%;
+    height: 20%;
+    border: #9B7EDE solid 2px;
+    background-color: #222;
+    object-fit: cover;
+}
+
+#visitor {
+    background-color: #474747;
+}
+
+#buttons {
+    bottom: 5%;
+}
+
+#buttons div {
+    width: 3em;
+    box-sizing: content-box;
+    padding: 1em;
+    border-radius: 10em;
+}
+
+img {
+    width: 100%;
+}
+
+#call-end {
+    background-color: rgba(219, 50, 77, 0.9);
+}
+
+#mic, #cam {
+    background-color: rgba(47, 47, 47, 0.9);
+}
+
+@media screen and (max-width: 900px) {
+    #owner {
+        width: 10em;
+        height: 9em;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    #buttons div {
+        width: 2em;
+    }
+}
