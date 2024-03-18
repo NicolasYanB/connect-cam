@@ -4,7 +4,7 @@ body {
     width: 100vw;
 }
 
-#owner {
+#local-video {
     top: 2%;
     left: 1%;
     border-radius: 10px;
@@ -15,7 +15,7 @@ body {
     object-fit: cover;
 }
 
-#visitor {
+#remote-video {
     background-color: #474747;
 }
 

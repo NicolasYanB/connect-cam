@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="/styles/room.css">
 </head>
 <body>
-    <video id="visitor" class="w-100 vh-100" autoplay playinline></video>
-    <video id="owner" class="position-absolute" autoplay playinline muted></video>
+    <video id="remote-video" class="w-100 vh-100" autoplay playinline></video>
+    <video id="local-video" class="position-absolute" autoplay playinline muted></video>
     <div id="buttons" class="position-absolute d-flex gap-5 translate-middle start-50">
         <div id="mic">
             <img id="mic-img" src="/images/mic_on.svg" alt="">
@@ -22,5 +22,6 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="/scripts/room.js"></script>
 </body>
 </html>
