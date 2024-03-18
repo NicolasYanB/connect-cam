@@ -1,5 +1,7 @@
 class Room {
     roomId;
-    onwerName;
+    ownerName;
     visitorName;
 }
+
+export {Room};
