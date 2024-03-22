@@ -37,7 +37,6 @@ const wsServer = new WebSocketServer({
 
 wsServer.on('request', (request) => {
     const connection = request.accept(null, request.origin);
-    console.log('connection made');
 
     connection.on('message', function (message) {
         const parsed = JSON.parse(message.utf8Data);
@@ -65,6 +64,19 @@ wsServer.on('request', (request) => {
                 connection.sendUTF(JSON.stringify(response));
             }
         }
+    });
+
+    connection.on('offer', function (payload) {
+        const {roomId, offer} = payload;
+        const {visitorConnection} = connectionManager.getConnection(roomId);
+        const response = {
+            event: 'receive',
+            payload: {
+                type: 'offer',
+                data: offer
+            }
+        };
+        visitorConnection.sendUTF(JSON.stringify(response));
     });
 });
 

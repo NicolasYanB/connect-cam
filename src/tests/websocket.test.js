@@ -4,6 +4,7 @@ import {
 } from 'websocket';
 
 import { ConnectionManager } from '../utils/connection-manager';
+import { generateId } from '../utils/generate-id';
 
 describe('Web Socket Test Suite', () => {
     let httpServer;
@@ -29,7 +30,7 @@ describe('Web Socket Test Suite', () => {
 
     function sleep(time) {
         return new Promise(resolve => {
-            setTimeout(resolve, time ?? 1000);
+            setTimeout(resolve, time ?? 100);
         });
     };
 
@@ -72,7 +73,7 @@ describe('Web Socket Test Suite', () => {
     test('Should add a visitor connection', async () => {
         let message;
         // Creates new connection
-        const roomId = 'qwertyuiop';
+        const roomId = generateId();
         const createRoomData = {
             event: 'open',
             payload: {
@@ -109,7 +110,7 @@ describe('Web Socket Test Suite', () => {
     test('Should receive reject event case the room is full', async () => {
         let message;
         // Creates new connection
-        const roomId = 'qwertyuiop';
+        const roomId = generateId();
         const createRoomData = {
             event: 'open',
             payload: {
@@ -145,5 +146,53 @@ describe('Web Socket Test Suite', () => {
 
         wsConnection2.close();
         wsConnection3.close();
+    });
+
+    test('Should emit receive event to visitor when an offer event is sent', async () => {
+        let message;
+        // Creates new connection
+        const roomId = generateId();
+        const createRoomData = {
+            event: 'open',
+            payload: {
+                roomId
+            }
+        };
+        message = JSON.stringify(createRoomData);
+        wsConnection.sendUTF(message);
+        await sleep();
+
+        const visitorConnection = await initWebSocketConnection(new WebSocketClient(), wsUrl);
+        const addVisitorData = {
+            event: 'join',
+            payload: {
+                roomId
+            }
+        };
+        message = JSON.stringify(addVisitorData);
+        visitorConnection.sendUTF(message);
+        await sleep();
+
+        const offer = "{type: 'offer', sdp: 'v=0\r\no=- 4568981565076271185 2 IN IP4 127.0.0.1\r\ns…0 0\r\na=extmap-allow-mixed\r\na=msid-semantic: WMS\r\n'}";
+        const createOfferData = {
+            event: 'offer',
+            payload: {
+                roomId,
+                offer
+            }
+        };
+        message = JSON.stringify(createOfferData);
+        wsConnection.sendUTF(message);
+        await new Promise(resolve => {
+            visitorConnection.on('receive', payload => {
+                expect(payload).toHaveProperty('type');
+                expect(payload).toHaveProperty('data');
+                expect(payload.type).toBe('offer');
+                expect(payload.data).toBe(offer);
+                resolve();
+            });
+        });
+
+        visitorConnection.close();
     });
 });
