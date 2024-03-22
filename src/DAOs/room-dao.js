@@ -1,6 +1,6 @@
-import { db } from "../database/db.js";
-import { Room } from "../entities/room.js";
 import { DataAccessObjectError } from "../errors/data-access-object-error.js";
+import { Room } from "../entities/room.js";
+import { db } from "../database/db.js";
 
 function createRoom({room_id, owner_name, visitor_name}) {
     const room = new Room();

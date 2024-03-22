@@ -6,9 +6,10 @@ import path from "path";
 import {server as WebSocketServer} from 'websocket';
 import express from "express";
 
+import { ConnectionManager } from './utils/connection-manager.js';
+import { ConnectionError } from './errors/connection-error.js';
 import { viewRouter } from "./routes/views.js";
 import { apiRouter } from "./routes/api.js";
-import { ConnectionManager } from './utils/connection-manager.js';
 
 
 const port = 3000;
@@ -47,6 +48,23 @@ wsServer.on('request', (request) => {
     connection.on('open', function (payload) {
         const {roomId} = payload;
         connectionManager.createConnection(roomId, this);
+    });
+
+    connection.on('join', function (payload) {
+        const {roomId} = payload;
+        try {
+            connectionManager.addVisitorToConnection(roomId, this);
+        } catch(e) {
+            if (e instanceof ConnectionError) {
+                const response = {
+                    event: 'reject',
+                    payload: {
+                        message: 'This room is already full'
+                    }
+                };
+                connection.sendUTF(JSON.stringify(response));
+            }
+        }
     });
 });
 

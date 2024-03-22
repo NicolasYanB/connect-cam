@@ -1,5 +1,7 @@
+import { ConnectionError } from "../errors/connection-error";
+
 class ConnectionManager {
-    // Singleton to manage web socket connections
+    // Singleton pattern to manage web socket connections
     #connections = [];
     static #instance = null;
 
@@ -24,6 +26,14 @@ class ConnectionManager {
             throw new Error('Connection not found');
         }
         return connection;
+    }
+
+    addVisitorToConnection(roomId, visitorConnection) {
+        const connection = this.getConnection(roomId);
+        if (connection.visitorConnection) {
+            throw new ConnectionError('Cannot add visitor to the room');
+        }
+        connection.visitorConnection = visitorConnection;
     }
 }
 
