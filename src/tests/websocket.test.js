@@ -175,10 +175,11 @@ describe('Web Socket Test Suite', () => {
 
         const offer = "{type: 'offer', sdp: 'v=0\r\no=- 4568981565076271185 2 IN IP4 127.0.0.1\r\ns…0 0\r\na=extmap-allow-mixed\r\na=msid-semantic: WMS\r\n'}";
         const createOfferData = {
-            event: 'offer',
+            event: 'send',
             payload: {
                 roomId,
-                offer
+                type: 'offer',
+                data: offer
             }
         };
         message = JSON.stringify(createOfferData);
@@ -189,6 +190,55 @@ describe('Web Socket Test Suite', () => {
                 expect(payload).toHaveProperty('data');
                 expect(payload.type).toBe('offer');
                 expect(payload.data).toBe(offer);
+                resolve();
+            });
+        });
+
+        visitorConnection.close();
+    });
+
+    test('Should emit receive event to owner then an answer event is sent', async () => {
+        let message;
+        const roomId = generateId();
+        const createRoomData = {
+            event: 'open',
+            payload: {
+                roomId
+            }
+        };
+        message = JSON.stringify(createRoomData);
+        wsConnection.sendUTF(message);
+        await sleep();
+
+        const visitorConnection = await initWebSocketConnection(new WebSocketClient(), wsUrl);
+        const addVisitorData = {
+            event: 'join',
+            payload: {
+                roomId
+            }
+        };
+        message = JSON.stringify(addVisitorData);
+        visitorConnection.sendUTF(message);
+        await sleep();
+
+
+        const answer = "{type: 'answer', sdp: 'v=0\r\no=- 2634640323328634448 2 IN IP4 127.0.0.1\r\ns…0 0\r\na=extmap-allow-mixed\r\na=msid-semantic: WMS\r\n'}";
+        const createAnwswerData = {
+            event: 'send',
+            payload: {
+                roomId,
+                type: 'answer',
+                data: answer
+            }
+        };
+        message = JSON.stringify(createAnwswerData);
+        visitorConnection.sendUTF(message);
+        await new Promise(resolve => {
+            wsConnection.on('receive', payload => {
+                expect(payload).toHaveProperty('type');
+                expect(payload).toHaveProperty('data');
+                expect(payload.type).toBe('answer');
+                expect(payload.data).toBe(answer);
                 resolve();
             });
         });

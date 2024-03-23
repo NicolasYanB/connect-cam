@@ -66,17 +66,24 @@ wsServer.on('request', (request) => {
         }
     });
 
-    connection.on('offer', function (payload) {
-        const {roomId, offer} = payload;
-        const {visitorConnection} = connectionManager.getConnection(roomId);
+    connection.on('send', function (payload) {
+        const {roomId, type, data} = payload;
+        const conn = connectionManager.getConnection(roomId);
+        let peerConection;
+        if (type === 'offer') {
+            peerConection = conn.visitorConnection;
+        } else if (type === 'answer') {
+            peerConection = conn.ownerConnection;
+        } else {
+            throw new Error('type field is not valid');
+        }
+
         const response = {
             event: 'receive',
-            payload: {
-                type: 'offer',
-                data: offer
-            }
+            payload: {type, data}
         };
-        visitorConnection.sendUTF(JSON.stringify(response));
+
+        peerConection.sendUTF(JSON.stringify(response));
     });
 });
 
