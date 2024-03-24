@@ -7,6 +7,7 @@ async function callCreateRoom(nickname) {
     const roomId = data.id;
     sessionStorage.setItem('roomId', roomId);
     sessionStorage.setItem('username', nickname);
+    sessionStorage.setItem('isOwner', 'true');
     window.location.href = `http://localhost:3000/room/${roomId}`;
 }
 
@@ -29,7 +30,7 @@ document.getElementById('enter-room').onclick = async (_) => {
     localStorage.setItem('nickname', nickname);
 
     try {
-        await callCreateRoom();
+        await callCreateRoom(nickname);
     } catch(e) {
         alert('It was not possible to create a room');
         console.log(e.message);

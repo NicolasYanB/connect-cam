@@ -53,6 +53,12 @@ wsServer.on('request', (request) => {
         const {roomId} = payload;
         try {
             connectionManager.addVisitorToConnection(roomId, this);
+            const {ownerConnection} = connectionManager.getConnection(roomId);
+            const response = {
+                event: 'found',
+                payload: {}
+            };
+            ownerConnection.sendUTF(JSON.stringify(response));
         } catch(e) {
             if (e instanceof ConnectionError) {
                 const response = {

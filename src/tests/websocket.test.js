@@ -97,6 +97,12 @@ describe('Web Socket Test Suite', () => {
         };
         message = JSON.stringify(addVisitorData);
         newWsConnection.sendUTF(message);
+        const ownerResponse = new Promise(resolve => {
+            wsConnection.on('found', payload => {
+                resolve();
+            });
+        });
+        await expect(ownerResponse).resolves.toBeUndefined();
         await sleep();
         const connectionManager = ConnectionManager.getConnectionManager();
         expect(() => connectionManager.getConnection(roomId)).not.toThrow();

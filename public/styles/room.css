@@ -17,6 +17,7 @@ body {
 
 #remote-video {
     background-color: #474747;
+    object-fit: cover;
 }
 
 #buttons {

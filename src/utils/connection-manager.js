@@ -1,4 +1,4 @@
-import { ConnectionError } from "../errors/connection-error";
+import { ConnectionError } from "../errors/connection-error.js";
 
 class ConnectionManager {
     // Singleton pattern to manage web socket connections
