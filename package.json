@@ -2,11 +2,12 @@
   "name": "connectcam",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "type": "module",
   "scripts": {
     "dev": "nodemon src/index.js",
-    "test": "DOTENV_CONFIG_PATH=.env.test jest --setupFiles=dotenv/config --detectOpenHandles"
+    "test": "DOTENV_CONFIG_PATH=.env.test jest --setupFiles=dotenv/config --detectOpenHandles",
+    "start": "node src/index.js"
   },
   "keywords": [],
   "author": "",

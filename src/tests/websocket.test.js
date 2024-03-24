@@ -245,4 +245,98 @@ describe('Web Socket Test Suite', () => {
 
         visitorConnection.close();
     });
+
+    test('Should emit new-candidate event on visitor when the owner peer finds a new ICE candidate', async () => {
+        let message;
+        const roomId = generateId();
+        const createRoomData = {
+            event: 'open',
+            payload: {
+                roomId
+            }
+        };
+        message = JSON.stringify(createRoomData);
+        wsConnection.sendUTF(message);
+        await sleep();
+
+        const visitorConnection = await initWebSocketConnection(new WebSocketClient(), wsUrl);
+        const addVisitorData = {
+            event: 'join',
+            payload: {
+                roomId
+            }
+        };
+        message = JSON.stringify(addVisitorData);
+        visitorConnection.sendUTF(message);
+        await sleep();
+
+        const candidate = 'a=candidate:4234997325 1 udp 2043278322 192.0.2.172 44323 typ host';
+        const addOwnerCandidateData = {
+            event: 'candidate',
+            payload: {
+                roomId,
+                client: 'owner',
+                candidate
+            }
+        };
+        message = JSON.stringify(addOwnerCandidateData);
+        wsConnection.sendUTF(message);
+
+        await new Promise(resolve => {
+            visitorConnection.on('new-candidate', payload => {
+                expect(payload).toHaveProperty('candidate');
+                expect(payload.candidate).toBe(candidate);
+                resolve();
+            });
+        });
+
+        visitorConnection.close();
+    });
+
+    test('Should emit new-candidate event on owner when the visitor peer finds a new ICE candidate', async () => {
+        let message;
+        const roomId = generateId();
+        const createRoomData = {
+            event: 'open',
+            payload: {
+                roomId
+            }
+        };
+        message = JSON.stringify(createRoomData);
+        wsConnection.sendUTF(message);
+        await sleep();
+
+        const visitorConnection = await initWebSocketConnection(new WebSocketClient(), wsUrl);
+        const addVisitorData = {
+            event: 'join',
+            payload: {
+                roomId
+            }
+        };
+        message = JSON.stringify(addVisitorData);
+        visitorConnection.sendUTF(message);
+        await sleep();
+
+        const candidate = 'a=candidate:4234997325 1 udp 2043278322 192.0.2.172 44323 typ host';
+        const addVisitorCandidateData = {
+            event: 'candidate',
+            payload: {
+                roomId,
+                client: 'visitor',
+                candidate
+            }
+        };
+        message = JSON.stringify(addVisitorCandidateData);
+        visitorConnection.sendUTF(message);
+
+        await new Promise(resolve => {
+            wsConnection.on('new-candidate', payload => {
+                expect(payload).toHaveProperty('candidate');
+                expect(payload.candidate).toBe(candidate);
+                resolve();
+            });
+        });
+
+        visitorConnection.close();
+    });
 });

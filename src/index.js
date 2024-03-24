@@ -85,6 +85,26 @@ wsServer.on('request', (request) => {
 
         peerConection.sendUTF(JSON.stringify(response));
     });
+
+    connection.on('candidate', function (payload) {
+        const {roomId, client, candidate} = payload;
+        const conn = connectionManager.getConnection(roomId);
+        let peerConection;
+        if (client === 'owner') {
+            peerConection = conn.visitorConnection;
+        } else if (client === 'visitor') {
+            peerConection = conn.ownerConnection;
+        } else {
+            throw new Error('client field is not valid');
+        }
+
+        const response = {
+            event: 'new-candidate',
+            payload: {candidate}
+        };
+
+        peerConection.sendUTF(JSON.stringify(response));
+    });
 });
 
 export {server};
