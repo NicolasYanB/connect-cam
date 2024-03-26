@@ -3,7 +3,7 @@ import { clean } from '../utils/clean-db';
 
 describe('Room API Test Suite', () => {
     let server;
-    const baseUrl = 'http://localhost:3000/api';
+    const baseUrl = 'http://127.0.0.1:3000/api';
 
     beforeAll(async () => {
         server = (await import('../index')).server; 
