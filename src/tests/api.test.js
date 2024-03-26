@@ -1,16 +1,10 @@
-import { db } from '../database/db';
-import { clean } from '../utils/clean-db';
 
 describe('Room API Test Suite', () => {
     let server;
-    const baseUrl = 'http://127.0.0.1:3000/api';
+    const baseUrl = 'http://127.0.0.1:3000/api'; // this aparently solves a mysterious undici error
 
     beforeAll(async () => {
         server = (await import('../index')).server; 
-    });
-
-    beforeEach(() => {
-        clean();
     });
 
     test('Should create user and return the user id', async () => {
@@ -22,7 +16,6 @@ describe('Room API Test Suite', () => {
     });
 
     afterAll(async () => {
-        db.end();
         await server.close();
     });
 });

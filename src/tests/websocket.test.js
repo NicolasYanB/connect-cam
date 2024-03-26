@@ -4,7 +4,6 @@ import {
 } from 'websocket';
 
 import { ConnectionManager } from '../utils/connection-manager';
-import { db } from '../database/db';
 import { sleep } from '../utils/sleep';
 
 describe('Web Socket Test Suite', () => {
@@ -13,7 +12,8 @@ describe('Web Socket Test Suite', () => {
     let wsConnection;
 
     const wsUrl = 'ws://localhost:3000';
-    const baseUrl = 'http://localhost:3000'; 
+    const baseUrl = 'http://localhost:3000';
+    const createRoomUrl = `${baseUrl}/api/create-room`;
 
     function initWebSocketConnection(wsClient, wsUrl) {
         return new Promise((resolve, reject) => {
@@ -44,12 +44,11 @@ describe('Web Socket Test Suite', () => {
     });
 
     afterAll(async () => {
-        db.end();
         await httpServer.close();
     });
 
     test('Should create a new connection', async () => {
-        const response = await fetch(`${baseUrl}/api/create-room?ownerName=Nicolas`);
+        const response = await fetch(createRoomUrl);
         const data = await response.json();
         const roomId = data.id;
         const createRoomData = {
@@ -72,7 +71,7 @@ describe('Web Socket Test Suite', () => {
     test('Should add a visitor connection', async () => {
         let message;
         // Creates new connection
-        const response = await fetch(`${baseUrl}/api/create-room?ownerName=Nicolas`);
+        const response = await fetch(createRoomUrl);
         const data = await response.json();
         const roomId = data.id;
         const createRoomData = {
@@ -117,7 +116,7 @@ describe('Web Socket Test Suite', () => {
     test('Should receive reject event case the room is full', async () => {
         let message;
         // Creates new connection
-        const response = await fetch(`${baseUrl}/api/create-room?ownerName=Nicolas`);
+        const response = await fetch(createRoomUrl);
         const data = await response.json();
         const roomId = data.id;
         const createRoomData = {
@@ -160,7 +159,7 @@ describe('Web Socket Test Suite', () => {
     test('Should emit receive event to visitor when an offer event is sent', async () => {
         let message;
         // Creates new connection
-        const response = await fetch(`${baseUrl}/api/create-room?ownerName=Nicolas`);
+        const response = await fetch(createRoomUrl);
         const data = await response.json();
         const roomId = data.id;
         const createRoomData = {
@@ -210,7 +209,7 @@ describe('Web Socket Test Suite', () => {
 
     test('Should emit receive event to owner then an answer event is sent', async () => {
         let message;
-        const response = await fetch(`${baseUrl}/api/create-room?ownerName=Nicolas`);
+        const response = await fetch(createRoomUrl);
         const data = await response.json();
         const roomId = data.id;
         const createRoomData = {
@@ -261,7 +260,7 @@ describe('Web Socket Test Suite', () => {
 
     test('Should emit new-candidate event on visitor when the owner peer finds a new ICE candidate', async () => {
         let message;
-        const response = await fetch(`${baseUrl}/api/create-room?ownerName=Nicolas`);
+        const response = await fetch(createRoomUrl);
         const data = await response.json();
         const roomId = data.id;
         const createRoomData = {
@@ -310,7 +309,7 @@ describe('Web Socket Test Suite', () => {
 
     test('Should emit new-candidate event on owner when the visitor peer finds a new ICE candidate', async () => {
         let message;
-        const response = await fetch(`${baseUrl}/api/create-room?ownerName=Nicolas`);
+        const response = await fetch(createRoomUrl);
         const data = await response.json();
         const roomId = data.id;
         const createRoomData = {

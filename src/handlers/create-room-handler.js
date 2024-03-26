@@ -1,9 +1,8 @@
 import { createRoom } from "../actions/create-room.js";
 
 async function handleCreateRoom(req, res) {
-    const {ownerName} = req.query;
     try {
-        const id = await createRoom(ownerName);
+        const id = await createRoom();
         res.status(200).send({id});
     } catch (e) {
         console.log(e.message);
