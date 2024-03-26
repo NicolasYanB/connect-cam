@@ -46,7 +46,7 @@ wsServer.on('request', (request) => {
 
     connection.on('open', function (payload) {
         const {roomId} = payload;
-        connectionManager.createConnection(roomId, this);
+        connectionManager.addOwnerToConnection(roomId, this);
     });
 
     connection.on('join', function (payload) {

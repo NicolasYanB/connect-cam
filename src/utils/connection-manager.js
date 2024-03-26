@@ -12,10 +12,10 @@ class ConnectionManager {
         return ConnectionManager.#instance;
     }
 
-    createConnection(roomId, ownerConnection) {
+    createConnection(roomId) {
         this.#connections.push({
             roomId,
-            ownerConnection,
+            ownerConnection: null,
             visitorConnection: null
         });
     }
@@ -34,6 +34,11 @@ class ConnectionManager {
             throw new ConnectionError('Cannot add visitor to the room');
         }
         connection.visitorConnection = visitorConnection;
+    }
+
+    addOwnerToConnection(roomId, ownerConnection) {
+        const connection = this.getConnection(roomId);
+        connection.ownerConnection = ownerConnection;
     }
 }
 
