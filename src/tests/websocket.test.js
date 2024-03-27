@@ -355,4 +355,95 @@ describe('Web Socket Test Suite', () => {
 
         visitorConnection.close();
     });
+
+    test('Should emit exit to visitor when owner close connection', async () => {
+        let message;
+        const response = await fetch(createRoomUrl);
+        const data = await response.json();
+        const roomId = data.id;
+        const createRoomData = {
+            event: 'open',
+            payload: {
+                roomId
+            }
+        };
+        message = JSON.stringify(createRoomData);
+        wsConnection.sendUTF(message);
+        await sleep();
+
+        const visitorConnection = await initWebSocketConnection(new WebSocketClient(), wsUrl);
+        const addVisitorData = {
+            event: 'join',
+            payload: {
+                roomId
+            }
+        };
+        message = JSON.stringify(addVisitorData);
+        visitorConnection.sendUTF(message);
+        await sleep();
+
+        const closePayload = {
+            event: 'end',
+            payload: {
+                roomId
+            }
+        };
+        message = JSON.stringify(closePayload);
+        wsConnection.sendUTF(message);
+        const visitorEvent = new Promise(resolve => {
+            visitorConnection.on('exit', _ => {
+                resolve();
+            }
+            );
+        });
+        await expect(visitorEvent).resolves.toBeUndefined();
+        const connectionManager = ConnectionManager.getConnectionManager();
+        expect(() => connectionManager.getConnection(roomId)).toThrow('Connection not found');
+    });
+
+    test('Should emit disconnect to owner when visitor disconnects', async () => {
+        let message;
+        const response = await fetch(createRoomUrl);
+        const data = await response.json();
+        const roomId = data.id;
+        const createRoomData = {
+            event: 'open',
+            payload: {
+                roomId
+            }
+        };
+        message = JSON.stringify(createRoomData);
+        wsConnection.sendUTF(message);
+        await sleep();
+
+        const visitorConnection = await initWebSocketConnection(new WebSocketClient(), wsUrl);
+        const addVisitorData = {
+            event: 'join',
+            payload: {
+                roomId
+            }
+        };
+        message = JSON.stringify(addVisitorData);
+        visitorConnection.sendUTF(message);
+        await sleep();
+
+        const closePayload = {
+            event: 'disconnect',
+            payload: {
+                roomId
+            }
+        };
+        message = JSON.stringify(closePayload);
+        visitorConnection.sendUTF(message);
+        const ownerEvent = new Promise(resolve => {
+            wsConnection.on('disconnect-peer', _ => {
+                resolve();
+            }
+            );
+        });
+        await expect(ownerEvent).resolves.toBeUndefined();
+        const connectionManager = ConnectionManager.getConnectionManager();
+        const conn = connectionManager.getConnection(roomId);
+        expect(conn.visitorConnection).toBeNull();
+    });
 });

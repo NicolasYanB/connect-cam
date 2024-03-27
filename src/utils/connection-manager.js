@@ -40,6 +40,19 @@ class ConnectionManager {
         const connection = this.getConnection(roomId);
         connection.ownerConnection = ownerConnection;
     }
+
+    removeConnection(roomId) {
+        const conn = this.getConnection(roomId);
+        conn.ownerConnection.close(1000);
+        conn.visitorConnection.close(1000);
+        this.#connections = this.#connections.filter(conn => conn.roomId !== roomId);
+    }
+
+    disconnectVisitor(roomId) {
+        const conn = this.getConnection(roomId);
+        conn.visitorConnection.close(1000);
+        conn.visitorConnection = null;
+    }
 }
 
 export {ConnectionManager};

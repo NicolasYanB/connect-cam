@@ -111,6 +111,30 @@ wsServer.on('request', (request) => {
 
         peerConection.sendUTF(JSON.stringify(response));
     });
+
+    connection.on('end', function (payload) {
+        const {roomId} = payload;
+        const conn = connectionManager.getConnection(roomId);
+        const peerConnection = conn.visitorConnection;;
+        const response = {
+            event: 'exit',
+            payload: {}
+        };
+        peerConnection.sendUTF(JSON.stringify(response));
+        connectionManager.removeConnection(roomId);
+    });
+
+    connection.on('disconnect',function (payload) {
+        const {roomId} = payload;
+        const conn = connectionManager.getConnection(roomId);
+        const peerConection = conn.ownerConnection;
+        const response = {
+            event: 'disconnect-peer',
+            payload: {}
+        };
+        peerConection.sendUTF(JSON.stringify(response));
+        connectionManager.disconnectVisitor(roomId);
+    });
 });
 
 export {server};
