@@ -89,6 +89,20 @@ webSocket.onmessage = function (e) {
     listener(payload);
 };
 
+function close() {
+    localStream.getTracks().forEach(track => track.enabled = false);
+    const eventType = isOwner ? 'end' : 'disconnect';
+    const request = {
+        event: eventType,
+        payload: {
+            roomId
+        }
+    };
+    webSocket.sendRequest(request);
+    peerConnection.close();
+    window.location.href = url;
+}
+
 window.onload = async (_) => {
     localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
     const remoteStream = new MediaStream();
@@ -115,6 +129,11 @@ window.onload = async (_) => {
         webSocket.sendRequest(joinRequest);
     }
 };
+
+window.addEventListener('pagehide', event => {
+    if (event.persisted) return; // if event.persisted is true, then the page will not close
+    close();
+});
 
 document.getElementById('cam').onclick = event => {
     const videoTrack = localStream.getTracks().find(track => track.kind === 'video');
@@ -146,16 +165,4 @@ document.getElementById('mic').onclick = event => {
     }
 };
 
-document.getElementById('call-end').onclick = _ => {
-    localStream.getTracks().forEach(track => track.enabled = false);
-    const eventType = isOwner ? 'end' : 'disconnect';
-    const request = {
-        event: eventType,
-        payload: {
-            roomId
-        }
-    };
-    webSocket.sendRequest(request);
-    peerConnection.close();
-    window.location.href = url;
-};
+document.getElementById('call-end').onclick = close;
