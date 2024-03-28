@@ -6,14 +6,13 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon src/index.js",
-    "test": "DOTENV_CONFIG_PATH=.env.test jest --setupFiles=dotenv/config --detectOpenHandles",
+    "test": "jest --detectOpenHandles",
     "start": "node src/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "16.4.5",
     "express": "4.18.3",
     "pg": "8.11.3",
     "uuid": "9.0.1",
