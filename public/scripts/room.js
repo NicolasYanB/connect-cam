@@ -1,6 +1,7 @@
 let localStream;
 const roomId = sessionStorage.getItem('roomId');
 const isOwner = !!(sessionStorage.getItem('isOwner'));
+const url = 'http://localhost:3000';
 let peerConnection = new RTCPeerConnection();
 let webSocket = new WebSocket('ws://localhost:3000');
 
@@ -64,10 +65,21 @@ function newCandidate (payload) {
     peerConnection.addIceCandidate(candidate);
 }
 
+function exit () {
+    peerConnection.close();
+    window.location.href = url;
+}
+
+function disconnect() {
+    document.getElementById('remote-video').srcObject = null;
+}
+
 const events = {
     'found': found,
     'receive': receive,
-    'new-candidate': newCandidate
+    'new-candidate': newCandidate,
+    'exit': exit,
+    'disconnect-peer': disconnect
 };
 
 webSocket.onmessage = function (e) {
@@ -81,10 +93,10 @@ window.onload = async (_) => {
     localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
     const remoteStream = new MediaStream();
     document.getElementById('local-video').srcObject = localStream;
-    document.getElementById('remote-video').srcObject = remoteStream;
 
     localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
     peerConnection.ontrack = event => {
+        document.getElementById('remote-video').srcObject = remoteStream;
         event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
     };
 
@@ -132,4 +144,18 @@ document.getElementById('mic').onclick = event => {
         div.style.backgroundColor = 'rgba(47, 47, 47, 0.9)';
         img.src = '/images/mic_on.svg';
     }
+};
+
+document.getElementById('call-end').onclick = _ => {
+    localStream.getTracks().forEach(track => track.enabled = false);
+    const eventType = isOwner ? 'end' : 'disconnect';
+    const request = {
+        event: eventType,
+        payload: {
+            roomId
+        }
+    };
+    webSocket.sendRequest(request);
+    peerConnection.close();
+    window.location.href = url;
 };
