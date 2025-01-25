@@ -1,5 +1,5 @@
 # Connect Cam
-A simple video call app to connect two persons
+A simple video call app to connect two people
 
 # Tech used
 Implements the WebRTC protocol to send audio and video in real time and uses WebSocket to signal the ICE candidates between peers
